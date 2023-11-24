@@ -30,4 +30,3 @@ export class User extends BaseEntity {
     return bcrypt.compare(password, this.password);
   }
 }
-

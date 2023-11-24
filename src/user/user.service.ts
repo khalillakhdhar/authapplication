@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -12,10 +13,18 @@ export class UserService {
     private userRepository: Repository<User>,
   ) {}
   async create(createUserDto: CreateUserDto) {
-    // const user = User.create(createUserDto);
-    await this.userRepository.save(createUserDto);
-    delete createUserDto.password;
-    return createUserDto;
+    const user = new User();
+    user.email = createUserDto.email;
+    user.password = createUserDto.password; // Ne pas oublier de hasher le mot de passe dans l'entité avant de le sauvegarder.
+
+    await user.hashPassword(); // Utilisez la méthode hashPassword pour crypter le mot de passe.
+
+    await this.userRepository.save(user);
+
+    // Ne renvoyez pas le DTO avec le mot de passe directement, c'est une bonne pratique de ne pas exposer le mot de passe.
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...result } = user;
+    return result;
   }
 
   findAll() {
